@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 is_yes() {
   yesses={y,Y,yes,Yes,YES}
@@ -33,7 +33,6 @@ read -p "What is your default terminal app? [$current_app] " terminal_app
 if [[ ! $terminal_app ]]; then
   terminal_app=$current_app
 fi
-
 
 # ==============================================================================
 # Ask for install location
@@ -79,24 +78,17 @@ bash -c "cp -r build/ $install_dir"
 # ==============================================================================
 
 if [[ $(echo $SHELL | grep bash) ]]; then
-  RC_FILE=$HOME/.bashrc
-elif [[ $(echo $SHELL | grep zsh) ]]; then
-  RC_FILE=$HOME/.zshrc
-elif [[ $(echo $SHELL | grep fish) ]]; then
-  RC_FILE=$HOME/.config/fish/config.fish
-else
-  echo "Unknown shell type!"
-  echo "You'll have to set up aliases on your own."
+  RC_FILE=$HOME/.termtilerc
 fi
 
-aliases[0]="ul"   ;  arguments[0]="up left"
-aliases[1]="ur"   ;  arguments[1]="up right"
-aliases[2]="dl"   ;  arguments[2]="down left"
-aliases[3]="dr"   ;  arguments[3]="down right"
-aliases[4]="fl"   ;  arguments[4]="left"
-aliases[5]="fr"   ;  arguments[5]="right"
-aliases[6]="up"   ;  arguments[6]="up"
-aliases[7]="dn" ;  arguments[7]="down"
+aliases[0]="tlf"   ;  arguments[0]="up left"
+aliases[1]="trt"   ;  arguments[1]="up right"
+aliases[2]="blf"   ;  arguments[2]="down left"
+aliases[3]="brt"   ;  arguments[3]="down right"
+aliases[4]="lf"   ;  arguments[4]="left"
+aliases[5]="rt"   ;  arguments[5]="right"
+aliases[6]="tp"   ;  arguments[6]="up"
+aliases[7]="bm" ;  arguments[7]="down"
 
 
 newline=$'\n'
@@ -132,32 +124,6 @@ if [[ $RC_FILE ]]; then
     shopt -s expand_aliases
     # we only care about the aliases, so silence the warnings
     source $RC_FILE >/dev/null 2>&1
-
-    # "ll" is often used as "ls -l"
-    type ll >/dev/null 2>&1
-    using_ll=$?
-    if [[ $using_ll -eq 0 ]]; then
-      echo ""
-      echo "It appears that 'll' command is already used."
-      echo "I can change the default aliases:"
-      echo "ll -> fl         (fill left)"
-      echo "rr -> fr         (fill right)"
-      read -p "Do you want to switch them? [Y/n] " should_switch_defaults
-      if [[ ! $should_switch_defaults ]] || [[ $(is_yes $should_switch_defaults) ]]; then
-        echo "Changing the defaults..."
-        echo ""
-        aliases[4]="fl"
-        aliases[5]="fr"
-      fi
-    fi
-
-    # ask for prefix
-    read -p "Do you want to use a prefix for all aliases? [y/N] " should_prefix
-    if [[ $(is_yes $should_prefix) ]]; then
-      read -p "Enter prefix for all aliases: " alias_prefix
-    else
-      alias_prefix=""
-    fi
 
     # add aliases
     for i in ${!aliases[*]}; do
